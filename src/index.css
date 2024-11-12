@@ -1,0 +1,22 @@
+@import "leaflet/dist/leaflet.css";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.strong {
+    color: green;
+}
+
+.medium {
+    color: orange;
+}
+
+.weak {
+    color: red;
+}
+
+.font-press-start {
+  font-family: 'Press Start 2P', cursive;
+}
