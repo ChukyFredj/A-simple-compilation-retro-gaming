@@ -2,10 +2,10 @@ import { useFrame } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
 import { useEffect, useRef, useState } from 'react';
 
-export default function Bullet({ position, onHit }) {
+export default function EnemyBullet({ position, onHit, checkShield }) {
     const bulletRef = useRef();
     const [isActive, setIsActive] = useState(true);
-    const speed = 15;
+    const speed = 3;
     const lastUpdateTime = useRef(0);
 
     // Nettoyage à la destruction
@@ -27,14 +27,14 @@ export default function Bullet({ position, onHit }) {
         const currentPos = bulletRef.current.translation();
 
         // Vérifie si la balle est hors écran
-        if (currentPos.y > 10 || currentPos.y < -6) {
+        if (currentPos.y < -6 || currentPos.y > 10) {
             setIsActive(false);
             return;
         }
 
         bulletRef.current.setTranslation({
             x: currentPos.x,
-            y: currentPos.y + speed * delta,
+            y: currentPos.y - speed * delta,
             z: currentPos.z
         });
     });
@@ -46,21 +46,26 @@ export default function Bullet({ position, onHit }) {
             ref={bulletRef}
             type="dynamic"
             position={position}
-            mass={1}
-            gravityScale={0}
-            onCollisionEnter={() => {
-                setIsActive(false);
-                if (onHit) onHit();
+            sensor
+            name="enemyBullet"
+            onIntersectionEnter={(e) => {
+                if (e.other.rigidBodyObject.name === 'player') {
+                    setIsActive(false);
+                    const hasShield = checkShield();
+                    if (!hasShield && onHit) {
+                        onHit();
+                    }
+                }
             }}
         >
             <mesh>
-                <sphereGeometry args={[0.2]} />
+                <boxGeometry args={[0.2, 0.2, 0.2]} />
                 <meshStandardMaterial
-                    color="yellow"
-                    emissive="yellow"
+                    color="#ff0000"
+                    emissive="#ff0000"
                     emissiveIntensity={0.5}
                 />
             </mesh>
         </RigidBody>
     );
-}
+} 
