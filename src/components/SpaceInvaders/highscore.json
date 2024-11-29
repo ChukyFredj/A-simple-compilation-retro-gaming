@@ -1,202 +1,194 @@
 [
     {
-        "pseudo": "AlphaWolf",
-        "score": 24000
-    },
-    {
-        "pseudo": "DragonSlayer",
-        "score": 23900
-    },
-    {
-        "pseudo": "SilentShadow",
-        "score": 23800
-    },
-    {
-        "pseudo": "MysticMage",
-        "score": 23700
-    },
-    {
-        "pseudo": "NightHawk",
-        "score": 23600
-    },
-    {
-        "pseudo": "ThunderBolt",
+        "pseudo": "ChukyFredj",
         "score": 23500
     },
     {
-        "pseudo": "CosmicRider",
-        "score": 23400
+        "pseudo": "AlphaWolf",
+        "score": 21600
     },
     {
-        "pseudo": "BlazePhoenix",
-        "score": 23300
-    },
-    {
-        "pseudo": "SilverArrow",
-        "score": 23200
-    },
-    {
-        "pseudo": "CrimsonKnight",
-        "score": 23100
-    },
-    {
-        "pseudo": "DarkSorcerer",
-        "score": 22900
-    },
-    {
-        "pseudo": "GoldenEagle",
-        "score": 22700
-    },
-    {
-        "pseudo": "ShadowNinja",
-        "score": 22500
-    },
-    {
-        "pseudo": "FrostGiant",
-        "score": 22300
-    },
-    {
-        "pseudo": "EmeraldDragon",
-        "score": 22100
-    },
-    {
-        "pseudo": "FireStorm",
-        "score": 21900
-    },
-    {
-        "pseudo": "IronFist",
-        "score": 21700
-    },
-    {
-        "pseudo": "SapphireStar",
+        "pseudo": "DragonSlayer",
         "score": 21500
     },
     {
-        "pseudo": "QuantumLeap",
+        "pseudo": "SilentShadow",
+        "score": 21400
+    },
+    {
+        "pseudo": "MysticMage",
         "score": 21300
     },
     {
-        "pseudo": "PhantomGhost",
+        "pseudo": "NightHawk",
+        "score": 21200
+    },
+    {
+        "pseudo": "ThunderBolt",
         "score": 21100
     },
     {
-        "pseudo": "SteelSamurai",
+        "pseudo": "CosmicRider",
+        "score": 21000
+    },
+    {
+        "pseudo": "BlazePhoenix",
+        "score": 20900
+    },
+    {
+        "pseudo": "SilverArrow",
         "score": 20800
     },
     {
-        "pseudo": "NeonTiger",
+        "pseudo": "CrimsonKnight",
+        "score": 20700
+    },
+    {
+        "pseudo": "DarkSorcerer",
         "score": 20500
     },
     {
-        "pseudo": "LunarEclipse",
-        "score": 20200
+        "pseudo": "GoldenEagle",
+        "score": 20300
     },
     {
-        "pseudo": "SolarFlare",
+        "pseudo": "ShadowNinja",
+        "score": 20100
+    },
+    {
+        "pseudo": "FrostGiant",
         "score": 19900
     },
     {
-        "pseudo": "ShadowHunter",
-        "score": 19600
+        "pseudo": "EmeraldDragon",
+        "score": 19700
     },
     {
-        "pseudo": "MysticWarrior",
+        "pseudo": "FireStorm",
+        "score": 19500
+    },
+    {
+        "pseudo": "IronFist",
         "score": 19300
     },
     {
-        "pseudo": "ThunderStrike",
-        "score": 19000
+        "pseudo": "SapphireStar",
+        "score": 19100
     },
     {
-        "pseudo": "StormBringer",
+        "pseudo": "QuantumLeap",
+        "score": 18900
+    },
+    {
+        "pseudo": "PhantomGhost",
         "score": 18700
     },
     {
-        "pseudo": "SilentAssassin",
+        "pseudo": "SteelSamurai",
         "score": 18400
     },
     {
-        "pseudo": "CrimsonBlade",
+        "pseudo": "NeonTiger",
         "score": 18100
     },
     {
-        "pseudo": "GhostRider",
-        "score": 17700
+        "pseudo": "LunarEclipse",
+        "score": 17800
     },
     {
-        "pseudo": "IceQueen",
-        "score": 17300
+        "pseudo": "SolarFlare",
+        "score": 17500
     },
     {
-        "pseudo": "ShadowDancer",
+        "pseudo": "ShadowHunter",
+        "score": 17200
+    },
+    {
+        "pseudo": "MysticWarrior",
         "score": 16900
     },
     {
-        "pseudo": "MysticKnight",
-        "score": 16500
+        "pseudo": "ThunderStrike",
+        "score": 16600
     },
     {
-        "pseudo": "DarkAngel",
-        "score": 16100
+        "pseudo": "StormBringer",
+        "score": 16300
     },
     {
-        "pseudo": "GoldenLion",
+        "pseudo": "SilentAssassin",
+        "score": 16000
+    },
+    {
+        "pseudo": "CrimsonBlade",
         "score": 15700
     },
     {
-        "pseudo": "SilverFox",
+        "pseudo": "GhostRider",
         "score": 15300
     },
     {
-        "pseudo": "NightStalker",
+        "pseudo": "IceQueen",
         "score": 14900
     },
     {
-        "pseudo": "IronMaiden",
+        "pseudo": "ShadowDancer",
         "score": 14500
     },
     {
-        "pseudo": "PhoenixFire",
+        "pseudo": "MysticKnight",
         "score": 14100
     },
     {
-        "pseudo": "ThunderWolf",
-        "score": 13600
+        "pseudo": "DarkAngel",
+        "score": 13700
     },
     {
-        "pseudo": "MysticShadow",
-        "score": 13100
+        "pseudo": "GoldenLion",
+        "score": 13300
     },
     {
-        "pseudo": "SilentStorm",
-        "score": 12600
+        "pseudo": "SilverFox",
+        "score": 12900
     },
     {
-        "pseudo": "DragonHeart",
+        "pseudo": "NightStalker",
+        "score": 12500
+    },
+    {
+        "pseudo": "IronMaiden",
         "score": 12100
     },
     {
+        "pseudo": "PhoenixFire",
+        "score": 11700
+    },
+    {
+        "pseudo": "ThunderWolf",
+        "score": 11200
+    },
+    {
+        "pseudo": "MysticShadow",
+        "score": 10700
+    },
+    {
+        "pseudo": "SilentStorm",
+        "score": 10200
+    },
+    {
+        "pseudo": "DragonHeart",
+        "score": 9700
+    },
+    {
         "pseudo": "ShadowBlade",
-        "score": 11600
+        "score": 9200
     },
     {
         "pseudo": "FirePhoenix",
-        "score": 11100
+        "score": 8700
     },
     {
         "pseudo": "SilverBullet",
-        "score": 10600
-    },
-    {
-        "pseudo": "NightRider",
-        "score": 10100
-    },
-    {
-        "pseudo": "SteelDragon",
-        "score": 9600
-    },
-    {
-        "pseudo": "CosmicKnight",
-        "score": 9100
+        "score": 8200
     }
 ]

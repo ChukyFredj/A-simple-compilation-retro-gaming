@@ -27,7 +27,7 @@ const createCannonGeometry = () => {
     });
 };
 
-export default function Player({ onGameOver, chargeLevel, setChargeLevel, powerUps }) {
+export default function Player({ onGameOver, chargeLevel, setChargeLevel, powerUps, onShoot }) {
     const [bullets, setBullets] = useState([]);
     const playerRef = useRef();
     const lastShootTime = useRef(0);
@@ -103,6 +103,9 @@ export default function Player({ onGameOver, chargeLevel, setChargeLevel, powerU
                 if (!powerUps.infiniteEnergy) {
                     setChargeLevel(prev => Math.max(0, prev - energyCost));
                 }
+
+                // Jouer le son de tir
+                onShoot?.();
             }
         }
 

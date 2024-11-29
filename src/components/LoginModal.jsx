@@ -19,6 +19,10 @@ function LoginModal({ onClose, onLogin }) {
     }, []);
 
     const handleCreateAccount = () => {
+        if (!username || !password) {
+            alert('Veuillez entrer un pseudo et un mot de passe');
+            return;
+        }
         localStorage.setItem('username', username);
         localStorage.setItem('password', password);
         localStorage.setItem('isConnected', 'true');
@@ -56,6 +60,7 @@ function LoginModal({ onClose, onLogin }) {
                             type="text"
                             placeholder="Pseudo"
                             value={username}
+                            required
                             onChange={(e) => setUsername(e.target.value)}
                             className="border border-gray-400 p-2 mb-4 w-full placeholder-black font-press-start text-black"
                         />
@@ -63,6 +68,7 @@ function LoginModal({ onClose, onLogin }) {
                             type="password"
                             placeholder="Mot de passe"
                             value={password}
+                            required
                             onChange={(e) => setPassword(e.target.value)}
                             className="border border-gray-400 p-2 mb-4 w-full placeholder-black font-press-start text-black"
                         />
@@ -82,6 +88,7 @@ function LoginModal({ onClose, onLogin }) {
                             type="text"
                             placeholder="Pseudo"
                             value={username}
+                            required
                             onChange={(e) => setUsername(e.target.value)}
                             className="border border-gray-400 p-2 mb-4 w-full placeholder-black font-press-start text-black"
                         />
@@ -89,6 +96,7 @@ function LoginModal({ onClose, onLogin }) {
                             type="password"
                             placeholder="Mot de passe"
                             value={password}
+                            required
                             onChange={(e) => setPassword(e.target.value)}
                             className="border border-gray-400 p-2 mb-4 w-full placeholder-black font-press-start text-black"
                         />

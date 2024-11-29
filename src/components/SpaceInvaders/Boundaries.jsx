@@ -7,7 +7,7 @@ export default function Boundaries() {
             {/* Sol avec effet de grille */}
             <RigidBody type="fixed" position={[0, -6, 0]}>
                 <mesh>
-                    <boxGeometry args={[11, 0.1, 1]} />
+                    <boxGeometry args={[12, 0.1, 1]} />
                     <meshStandardMaterial
                         color="#50ff50"
                         emissive="#50ff50"
@@ -20,7 +20,7 @@ export default function Boundaries() {
             </RigidBody>
 
             {/* Bordure gauche avec effet lumineux */}
-            <RigidBody type="fixed" position={[-5.5, 0, 0]}>
+            <RigidBody type="fixed" position={[-6, 0, 0]}>
                 <mesh>
                     <boxGeometry args={[0.1, 13, 1]} />
                     <meshStandardMaterial
@@ -46,7 +46,7 @@ export default function Boundaries() {
             </RigidBody>
 
             {/* Bordure droite avec effet lumineux */}
-            <RigidBody type="fixed" position={[5.5, 0, 0]}>
+            <RigidBody type="fixed" position={[6, 0, 0]}>
                 <mesh>
                     <boxGeometry args={[0.1, 13, 1]} />
                     <meshStandardMaterial

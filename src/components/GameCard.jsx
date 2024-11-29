@@ -7,17 +7,28 @@ const GameCard = ({ title, image = '/api/placeholder/600/200', path }) => {
     const maxScores = {
         'Snake': 24000,
         'Space Invaders': 24000,
-        'Pong': 15000,
+        'Pong': 5,
+    };
+
+    const highScores = {
+        'Space Invaders': "spaceInvaders_highScores",
+        'Pong': "pong_high_scores",
     };
 
     const username = localStorage.getItem('username');
 
     const getGameStats = () => {
-        const rankings = JSON.parse(localStorage.getItem(`classement_${title.toLowerCase().replace(' ', '_')}`) || '[]');
-        const userRank = rankings.findIndex(score => score.username === username) + 1;
-        const userScore = userRank ? rankings[userRank - 1].score : 0;
+        const rankings = JSON.parse(localStorage.getItem(highScores[title]) || '[]');
+        const userRank = rankings.findIndex(score => score.pseudo === username) + 1;
+        const userScore = userRank ? title === 'Pong' ? rankings[userRank - 1].time : rankings[userRank - 1].score : 0;
         const maxScore = maxScores[title];
-        const progress = maxScore ? (userScore / maxScore) * 100 : 0;
+
+        // Calcul du pourcentage basé sur le rang pour Pong, sur le score pour les autres jeux
+        const progress = maxScore ?
+            title === 'Pong' ?
+                userRank ? (((rankings.length - userRank + 1) / rankings.length) * 100) : 0
+                : (userScore / maxScore) * 100
+            : 0;
 
         return {
             userRank,
@@ -73,8 +84,8 @@ const GameCard = ({ title, image = '/api/placeholder/600/200', path }) => {
                             {maxScores[title] && (
                                 <div className="flex-1">
                                     <div className="flex justify-between text-gray-300 text-xs mb-1">
-                                        <span>{stats.userScore.toLocaleString()} pts</span>
-                                        <span>{maxScores[title].toLocaleString()} pts</span>
+                                        <span>{stats.userScore.toLocaleString()} {title === 'Pong' ? 's' : 'pts'}</span>
+                                        <span>{maxScores[title].toLocaleString()} {title === 'Pong' ? 's' : 'pts'}</span>
                                     </div>
                                     <div className="w-full bg-gray-700 rounded-full h-2">
                                         <div

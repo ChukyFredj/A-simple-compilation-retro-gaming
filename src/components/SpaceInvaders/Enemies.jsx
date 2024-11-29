@@ -1,19 +1,8 @@
-import { useFrame, useLoader } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { RigidBody } from '@react-three/rapier';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import EnemyBullet from './EnemyBullet';
 import PowerUp from './PowerUp';
-
-// Mémoisation du modèle 3D
-const useEnemyModel = () => {
-    const materials = useLoader(MTLLoader, '/models/Space-Invaders-Enemy.mtl');
-    return useLoader(OBJLoader, '/models/Space-Invaders-Enemy.obj', (loader) => {
-        materials.preload();
-        loader.setMaterials(materials);
-    });
-};
 
 const ALIEN_COLORS = {
     1: "#ff0000",
@@ -21,10 +10,37 @@ const ALIEN_COLORS = {
     3: "#0000ff"
 };
 
+// Création d'un ennemi simple avec des formes géométriques
+const Enemy = ({ position, scale, color }) => {
+    return (
+        <group position={position} scale={[scale * 10, scale * 10, scale * 10]}>
+            {/* Corps principal */}
+            <mesh>
+                <boxGeometry args={[1, 0.8, 0.2]} />
+                <meshPhongMaterial
+                    color={color}
+                    emissive={color}
+                    emissiveIntensity={0.5}
+                    shininess={100}
+                />
+            </mesh>
+            {/* Yeux */}
+            <mesh position={[-0.2, 0.1, 0.2]}>
+                <sphereGeometry args={[0.1]} />
+                <meshPhongMaterial color="white" />
+            </mesh>
+            <mesh position={[0.2, 0.1, 0.2]}>
+                <sphereGeometry args={[0.1]} />
+                <meshPhongMaterial color="white" />
+            </mesh>
+        </group>
+    );
+};
+
 // Enlever useMemo de createWave et le déplacer dans le composant
 const createWave = (waveNumber = 1) => {
     const newEnemies = [];
-    const baseSpeed = 2 + (waveNumber - 1) * 2;
+    const baseSpeed = 2 + (waveNumber - 1) * 2.5;
 
     for (let row = 0; row < 3; row++) {
         for (let col = 0; col < 8; col++) {
@@ -44,7 +60,11 @@ const createWave = (waveNumber = 1) => {
             });
         }
     }
-    return { enemies: newEnemies, speed: baseSpeed };
+    return {
+        enemies: newEnemies,
+        speed: baseSpeed,
+        shootInterval: Math.max(2 - (waveNumber - 1) * 0.15, 0.5)
+    };
 };
 
 const Enemies = forwardRef(({
@@ -54,7 +74,8 @@ const Enemies = forwardRef(({
     onGameOver,
     currentWave,
     setPowerUps,
-    powerUps
+    powerUps,
+    score
 }, ref) => {
     const [enemies, setEnemies] = useState([]);
     const direction = useRef(1);
@@ -67,14 +88,22 @@ const Enemies = forwardRef(({
     const isWaveInProgress = useRef(false);
     const [enemyBullets, setEnemyBullets] = useState([]);
     const lastEnemyShootTime = useRef(0);
+    const bulletSpeed = useRef(8);
+    const isFirefox = useRef(navigator.userAgent.toLowerCase().includes('firefox'));
     const destroyingEnemies = useRef(new Set());
     const [localPowerUps, setLocalPowerUps] = useState([]);
     const timeoutRefs = useRef([]);
     const frameCount = useRef(0);
     const currentPositions = useRef([]);
     const lastUpdateTime = useRef(0);
+    const shootInterval = useRef(2);
+    const bulletsRef = useRef([]);
+    const bulletIdCounter = useRef(0);
 
-    const obj = useEnemyModel();
+    const generateUniqueId = useCallback(() => {
+        bulletIdCounter.current += 1;
+        return `bullet-${Date.now()}-${bulletIdCounter.current}`;
+    }, []);
 
     // Mémoisation de la création de vague
     const startNewWave = useCallback(() => {
@@ -88,6 +117,7 @@ const Enemies = forwardRef(({
 
             setEnemies(waveData.enemies);
             speed.current = waveData.speed;
+            shootInterval.current = waveData.shootInterval;
             onNewWave(waveNumber.current);
             waveNumber.current += 1;
 
@@ -105,6 +135,16 @@ const Enemies = forwardRef(({
 
     // Optimisation du mouvement des ennemis
     const updateEnemyPositions = useCallback((currentTime, delta) => {
+        setEnemies(prev => {
+            const newEnemies = prev.map(enemy => {
+                if (enemy.isAlive && enemy.position[1] <= -5.5) {
+                    return { ...enemy, isAlive: false };
+                }
+                return enemy;
+            });
+            return newEnemies;
+        });
+
         // Si pas assez de temps écoulé, on fait une interpolation
         if (currentTime - lastMoveTime.current < moveInterval) {
             const progress = (currentTime - lastMoveTime.current) / moveInterval;
@@ -164,41 +204,62 @@ const Enemies = forwardRef(({
         lastUpdateTime.current = currentTime;
     }, [enemies, aliveEnemies]);
 
-    // Optimisation des tirs ennemis
+    // Séparer la logique de tir
     const updateEnemyBullets = useCallback((currentTime) => {
-        frameCount.current++;
-
-        // Ne met à jour les tirs que tous les 3 frames
-        if (frameCount.current % 3 === 0) {
-            if (currentTime - lastEnemyShootTime.current > 2) {
-                if (aliveEnemies.length > 0 && Math.random() < 0.5) {
+        if (currentTime - lastEnemyShootTime.current > shootInterval.current) {
+            if (aliveEnemies.length > 0) {
+                const shootProbability = Math.min(0.3 + (waveNumber.current - 1) * 0.1, 0.8);
+                if (Math.random() < shootProbability) {
                     const lowestEnemies = aliveEnemies.reduce((acc, enemy) => {
-                        if (!acc[enemy.position[0]]) {
-                            acc[enemy.position[0]] = enemy;
-                        } else if (enemy.position[1] < acc[enemy.position[0]].position[1]) {
-                            acc[enemy.position[0]] = enemy;
+                        const x = Math.round(enemy.position[0] * 10) / 10;
+                        if (!acc[x] || enemy.position[1] < acc[x].position[1]) {
+                            acc[x] = enemy;
                         }
                         return acc;
                     }, {});
 
-                    const shootingEnemy = Object.values(lowestEnemies)[
-                        Math.floor(Math.random() * Object.values(lowestEnemies).length)
-                    ];
+                    const numShooters = Math.min(Math.floor((waveNumber.current - 1) / 3) + 1, 2);
+                    const shooters = Object.values(lowestEnemies)
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, numShooters);
 
-                    if (shootingEnemy && shootingEnemy.position[1] > -3) {
-                        setEnemyBullets(prev => [...prev, {
-                            id: Date.now(),
-                            position: [...shootingEnemy.position]
-                        }]);
-                    }
-                    lastEnemyShootTime.current = currentTime;
+                    shooters.forEach(shootingEnemy => {
+                        if (shootingEnemy && shootingEnemy.position[1] > -3) {
+                            if (bulletsRef.current.length < 6) {
+                                const newBullet = {
+                                    id: generateUniqueId(),
+                                    position: [...shootingEnemy.position],
+                                    velocity: bulletSpeed.current * (isFirefox.current ? 1.2 : 1)
+                                };
+                                bulletsRef.current.push(newBullet);
+                                setEnemyBullets(prev => [...prev, newBullet]);
+                            }
+                        }
+                    });
                 }
+                lastEnemyShootTime.current = currentTime;
             }
-
-            // Nettoyage des balles hors écran
-            setEnemyBullets(prev => prev.filter(bullet => bullet.position[1] > -6));
         }
-    }, [aliveEnemies]);
+    }, [aliveEnemies, waveNumber, generateUniqueId]);
+
+    // Mise à jour des positions des balles à chaque frame
+    const moveBullets = useCallback((delta) => {
+        if (bulletsRef.current.length === 0) return;
+
+        const newBullets = bulletsRef.current
+            .map(bullet => ({
+                ...bullet,
+                position: [
+                    bullet.position[0],
+                    bullet.position[1] - bullet.velocity * delta,
+                    bullet.position[2]
+                ]
+            }))
+            .filter(bullet => bullet.position[1] > -6);
+
+        bulletsRef.current = newBullets;
+        setEnemyBullets(newBullets);
+    }, []);
 
     // Optimisation du nettoyage des balles
     const cleanupBullets = useCallback(() => {
@@ -223,30 +284,34 @@ const Enemies = forwardRef(({
     }, []);
 
     const handleEnemyDestroy = useCallback((enemyId, points, position) => {
-        if (!destroyingEnemies.current.has(enemyId)) {
+        // Utiliser une mise à jour synchrone pour éviter les pertes de points
+        setEnemies(prev => {
+            // Si l'ennemi est déjà en cours de destruction, ignorer
+            if (destroyingEnemies.current.has(enemyId)) {
+                return prev;
+            }
+
             destroyingEnemies.current.add(enemyId);
 
-            setEnemies(prev => {
-                const newEnemies = prev.map(e =>
-                    e.id === enemyId ? { ...e, isAlive: false } : e
-                );
+            const newEnemies = prev.map(e =>
+                e.id === enemyId ? { ...e, isAlive: false } : e
+            );
 
-                // Vérifie si l'ennemi a été effectivement détruit
-                const wasDestroyed = newEnemies.some(e => e.id === enemyId && !e.isAlive);
-                if (wasDestroyed) {
-                    onEnemyDestroyed(points);
-                    spawnPowerUp(position);
-                }
-
-                return newEnemies;
-            });
+            // Vérifie si l'ennemi a été effectivement détruit
+            const wasDestroyed = newEnemies.some(e => e.id === enemyId && !e.isAlive);
+            if (wasDestroyed) {
+                // Appel immédiat pour le score
+                onEnemyDestroyed(points);
+                spawnPowerUp(position);
+            }
 
             // Nettoyage après un court délai
-            const timeout = setTimeout(() => {
+            setTimeout(() => {
                 destroyingEnemies.current.delete(enemyId);
             }, 100);
-            timeoutRefs.current.push(timeout);
-        }
+
+            return newEnemies;
+        });
     }, [onEnemyDestroyed]);
 
     useFrame((state, delta) => {
@@ -264,7 +329,17 @@ const Enemies = forwardRef(({
         }
         lastUpdateTime.current = currentTime;
 
+        // Mise à jour des positions des ennemis
         updateEnemyPositions(currentTime, delta);
+
+        // Mise à jour des tirs (moins fréquente)
+        frameCount.current++;
+        if (frameCount.current % (isFirefox.current ? 2 : 3) === 0) {
+            updateEnemyBullets(currentTime);
+        }
+
+        // Mise à jour des positions des balles (à chaque frame)
+        moveBullets(delta);
 
         if (currentWave >= 1) {
             updateEnemyBullets(currentTime);
@@ -336,6 +411,19 @@ const Enemies = forwardRef(({
         });
     };
 
+    // Ajouter une vérification des points totaux à la fin de chaque vague
+    useEffect(() => {
+        if (aliveEnemies.length === 0 && currentWave === 10) {
+            // Calculer le total des points qui auraient dû être gagnés
+            const expectedPoints = 24000;
+            if (score < expectedPoints) {
+                // Ajuster le score pour atteindre 24000
+                const missingPoints = expectedPoints - score;
+                onEnemyDestroyed(missingPoints);
+            }
+        }
+    }, [aliveEnemies.length, currentWave, score, onEnemyDestroyed]);
+
     return (
         <>
             {aliveEnemies.map(enemy => (
@@ -345,17 +433,11 @@ const Enemies = forwardRef(({
                     position={enemy.position}
                     onCollisionEnter={() => handleEnemyDestroy(enemy.id, enemy.points, enemy.position)}
                 >
-                    <primitive
-                        object={obj.clone()}
-                        scale={[enemy.scale, enemy.scale, enemy.scale]}
-                    >
-                        <meshPhongMaterial
-                            color={enemy.color}
-                            emissive={enemy.color}
-                            emissiveIntensity={0.5}
-                            shininess={100}
-                        />
-                    </primitive>
+                    <Enemy
+                        position={[0, 0, 0]}
+                        scale={enemy.scale}
+                        color={enemy.color}
+                    />
                 </RigidBody>
             ))}
             {enemyBullets.map(bullet => (
