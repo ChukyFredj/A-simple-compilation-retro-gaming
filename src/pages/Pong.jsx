@@ -140,7 +140,7 @@ export default function Pong() {
                 const savedScores = localStorage.getItem('pong_high_scores');
 
                 if (!savedScores) {
-                    const response = await fetch('/src/components/Pong/highscore.json');
+                    const response = await fetch('/highscore_p.json');
                     const data = await response.json();
                     const sortedData = data.sort((a, b) => a.time - b.time);
                     localStorage.setItem('pong_high_scores', JSON.stringify(sortedData));

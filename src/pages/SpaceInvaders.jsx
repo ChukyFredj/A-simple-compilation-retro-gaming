@@ -389,7 +389,7 @@ export default function SpaceInvaders() {
                 const savedScores = localStorage.getItem('spaceInvaders_highScores');
 
                 if (!savedScores) {
-                    const response = await fetch('/src/components/SpaceInvaders/highscore.json');
+                    const response = await fetch('/highscore_si.json');
                     const data = await response.json();
                     const sortedData = data.sort((a, b) => b.score - a.score);
                     localStorage.setItem('spaceInvaders_highScores', JSON.stringify(sortedData));
