@@ -571,7 +571,7 @@ export default function SpaceInvaders() {
                 <div className="bg-black bg-opacity-50 p-4 rounded">
                     <h3 className="text-sm mb-2">Commandes :</h3>
                     <ul className="text-xs space-y-1">
-                        <li>← → : Déplacer</li>
+                        <li>Q et D : Déplacer</li>
                         <li>ESPACE : Tirer</li>
                     </ul>
                 </div>
